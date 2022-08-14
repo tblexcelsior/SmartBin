@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="newPrefix">
+    <file>stink.png</file>
+    <file>other.png</file>
+    <file>plastic.png</file>
+  </qresource>
+</RCC>
