@@ -1,12 +1,13 @@
 import sys
 import random
 import mysql.connector as mdb
-from PySide2.QtCore import QTimer, Qt, SIGNAL
+from PySide2.QtCore import QTimer, Qt, SIGNAL, Slot
 from PySide2.QtWidgets import *
 from PySide2 import QtUiTools, QtWidgets
 from PySide2extn.RoundProgressBar import roundProgressBar
 from PySide2.QtCharts import QtCharts
 from PySide2.QtGui import QPainter
+from chart import Bar_Chart
 HOST = 'localhost'
 DATABASE = 'smart_bin'
 USER = 'tblexcel'
@@ -41,7 +42,7 @@ class MainWindow(object):
         self.sheet_1 = self.window.findChild(QFrame, 'type_1')
         self.sheet_2 = self.window.findChild(QFrame, 'type_2')
         self.sheet_3 = self.window.findChild(QFrame, 'type_3')
-
+        self.stat_frame = self.window.findChild(QFrame, 'stat_frame')
         ## Chart Frame
         self.chart_widget = self.window.findChild(QWidget, 'chart_widget')
 
@@ -83,36 +84,14 @@ class MainWindow(object):
         self.rpb_3.rpb_setPathColor((255, 255, 255))
 
         # Bar Graph Setting
-        self.type_chart = QtCharts.QChart()
+        self.type_chart = Bar_Chart()
         self.type_chart.setParent(self.chart_widget)
-        self.type_chart.setGeometry(0, 0, 980, 550)
-        self.hour_bar = QtCharts.QBarSet('Number of Wastes')
-        self.bar_value = [40, 12, 32, 40, 43 ,12, 35, 65, 12, 1]
-        self.hour_bar.append(self.bar_value)
-
-        self._bar_series = QtCharts.QBarSeries()
-        self._bar_series.append(self.hour_bar)
-
-
-        self.type_chart.addSeries(self._bar_series)
-        self.type_chart.setTitle("Garbage")
-        self.hours = ['8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00']
-        self._axis_x = QtCharts.QBarCategoryAxis()
-        self._axis_x.append(self.hours)
-        self.type_chart.setAxisX(self._axis_x, self._bar_series)
-        self._axis_x.setRange('8:00', '17:00')
-
-        self._axis_y = QtCharts.QValueAxis()
-        self.type_chart.setAxisY(self._axis_y, self._bar_series)
-        self._axis_y.setRange(0, max(self.bar_value))
-
-        self.type_chart.legend().setVisible(True)
-        self.type_chart.legend().setAlignment(Qt.AlignBottom)
         self._type_chart_view = QtCharts.QChartView(self.type_chart)
         self._type_chart_view.setRenderHint(QPainter.Antialiasing)
         self.chart_layout = QtWidgets.QHBoxLayout(self.chart_widget)
         self.chart_layout.setContentsMargins(0, 0, 0, 0)
         self.chart_layout.addWidget(self._type_chart_view)
+
 
         # Setting text position
         self.other_percent.setAlignment(Qt.AlignCenter)
@@ -124,40 +103,76 @@ class MainWindow(object):
         self._timer.timeout.connect(self.set_percent)
         self._timer.start()
 
+        # Toggle Button
+        self.toggle_status = 0
+        self.toggle_btn_frame = self.window.findChild(QWidget, 'Toggle_Btn')
+        self.toggle_slider = self.window.findChild(QWidget, 'pos_1')
+        self.toggle_day = self.window.findChild(QLabel, 'Day')
+        self.toggle_month = self.window.findChild(QLabel, 'Month')
+        self.toggle_month.setVisible(False)
+        self.toggle_day.setVisible(True)
+        self.toggle_btn = QPushButton()
+        self.toggle_btn.setParent(self.toggle_btn_frame)
+        self.toggle_btn.setGeometry(0, 0, 100, 40)
+        self.toggle_btn.setStyleSheet('background-color: rgba(255, 255, 255, 0);')
+        self.toggle_btn.connect(self.toggle_btn, SIGNAL('clicked()'), self.toggle_clicked)
+
+        # Date picker
+        self.day_picker = self.window.findChild(QDateEdit, 'dateEdit')
+        self.day_picker.editingFinished.connect(self.day_picked)
+
         # Button detect
         self.sheet_1_btn = QPushButton()
         self.sheet_1_btn.setParent(self.sheet_1)
         self.sheet_1_btn.setGeometry(0, 0, 250, 400)
         self.sheet_1_btn.setStyleSheet('background-color: rgba(255, 255, 255, 0);')
-        self.sheet_1_btn.connect(self.sheet_1_btn, SIGNAL('clicked()'), self.sheet1_clicked)
+        self.sheet_1_btn.connect(self.sheet_1_btn, SIGNAL('clicked()'), self.open_chart)
 
         self.sheet_2_btn = QPushButton()
         self.sheet_2_btn.setParent(self.sheet_2)
         self.sheet_2_btn.setGeometry(0, 0, 250, 400)
         self.sheet_2_btn.setStyleSheet('background-color: rgba(255, 255, 255, 0);')
-        self.sheet_2_btn.connect(self.sheet_2_btn, SIGNAL('clicked()'), self.sheet2_clicked)
+        self.sheet_2_btn.connect(self.sheet_2_btn, SIGNAL('clicked()'), self.open_chart)
 
         self.sheet_3_btn = QPushButton()
         self.sheet_3_btn.setParent(self.sheet_3)
         self.sheet_3_btn.setGeometry(0, 0, 250, 400)
         self.sheet_3_btn.setStyleSheet('background-color: rgba(255, 255, 255, 0);')
-        self.sheet_3_btn.connect(self.sheet_3_btn, SIGNAL('clicked()'), self.sheet3_clicked)
+        self.sheet_3_btn.connect(self.sheet_3_btn, SIGNAL('clicked()'), self.open_chart)
+        ## Statistic Button
+        self.stat_btn = QPushButton()
+        self.stat_btn.setParent(self.stat_frame)
+        self.stat_btn.setGeometry(0, 0, 200, 60)
+        self.stat_btn.setStyleSheet('background-color: rgba(255, 255, 255, 0);')
+        self.stat_btn.connect(self.stat_btn, SIGNAL('clicked()'), self.open_chart)
 
+        ## Exit button
         self.exit_btn.connect(self.exit_btn, SIGNAL('clicked()'), self.exit)
-
-    def sheet1_clicked(self):
+    # Callback function
+    ##----------------- Need to update ------------------------##
+    def open_chart(self):
         self.main_frame.setVisible(False)
         self.chart_frame.setVisible(True)
-    def sheet2_clicked(self):
-        self.main_frame.setVisible(False)
-        self.chart_frame.setVisible(True)
-    def sheet3_clicked(self):
-        self.main_frame.setVisible(False)
-        self.chart_frame.setVisible(True)
+    
+    def toggle_clicked(self):
+        if self.toggle_status == 0:
+            self.toggle_status = 1
+            self.toggle_month.setVisible(True)
+            self.toggle_day.setVisible(False)
+            self.day_picker.setVisible(False)
+        elif self.toggle_status == 1:
+            self.toggle_status = 0
+            self.toggle_month.setVisible(False)
+            self.toggle_day.setVisible(True)
+            self.day_picker.setVisible(True)
+        self.toggle_slider.setGeometry(self.toggle_status * 50, 0, 50, 40)
 
     def exit(self):
         self.main_frame.setVisible(True)
         self.chart_frame.setVisible(False)
+    ##-------------Get date date from this-----------------##
+    def day_picked(self):
+        print(str(self.day_picker.date()))
 
     def set_percent(self):
         try:
