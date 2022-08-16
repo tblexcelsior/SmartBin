@@ -18,7 +18,7 @@ class MainWindow(object):
         super().__init__()
         self.app = QApplication(sys.argv)
         loader = QtUiTools.QUiLoader()
-        self.window = loader.load('./app/component/MainGUI_t_2.ui', None)
+        self.window = loader.load('./SmartBin/app/component/MainGUI_t_2.ui', None)
 
         # Get main frame
         self.main_frame = self.window.findChild(QFrame, 'drop_shadow_frame')
