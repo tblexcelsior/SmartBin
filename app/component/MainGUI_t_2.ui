@@ -574,6 +574,32 @@ border: None;</string>
          </property>
         </widget>
        </widget>
+       <widget class="QLabel" name="status">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>50</y>
+          <width>1081</width>
+          <height>71</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>41</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(37, 255, 88);</string>
+        </property>
+        <property name="text">
+         <string>READY!</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
       </widget>
       <widget class="QFrame" name="Chart">
        <property name="geometry">

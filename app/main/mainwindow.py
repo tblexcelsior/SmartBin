@@ -1,3 +1,5 @@
+from pkgutil import get_data
+from re import A
 import sys
 import random
 import mysql.connector as mdb
@@ -8,17 +10,20 @@ from PySide2extn.RoundProgressBar import roundProgressBar
 from PySide2.QtCharts import QtCharts
 from PySide2.QtGui import QPainter
 from chart import Bar_Chart
+from datetime import datetime
 HOST = 'localhost'
 DATABASE = 'smart_bin'
 USER = 'tblexcel'
 PASSWORD = 'tblexcelsior'
+a = datetime.today().strftime('%Y-%m-%d')
+b = a.split('-')
 
 class MainWindow(object):
     def __init__(self) -> None:
         super().__init__()
         self.app = QApplication(sys.argv)
         loader = QtUiTools.QUiLoader()
-        self.window = loader.load('./SmartBin/app/component/MainGUI_t_2.ui', None)
+        self.window = loader.load('./app/component/MainGUI_t_2.ui', None)
 
         # Get main frame
         self.main_frame = self.window.findChild(QFrame, 'drop_shadow_frame')
@@ -45,6 +50,9 @@ class MainWindow(object):
         self.stat_frame = self.window.findChild(QFrame, 'stat_frame')
         ## Chart Frame
         self.chart_widget = self.window.findChild(QWidget, 'chart_widget')
+
+        ## Status text
+        self.status = self.window.findChild(QLabel, 'status')
 
         # Process Bar Design
         self.rpb_1 = roundProgressBar()
@@ -84,8 +92,12 @@ class MainWindow(object):
         self.rpb_3.rpb_setPathColor((255, 255, 255))
 
         # Bar Graph Setting
-        self.type_chart = Bar_Chart()
+        
+        data_for_daily_type1 = self.getdata(1)
+        self.type_chart = Bar_Chart(data_for_daily_type1)
         self.type_chart.setParent(self.chart_widget)
+        # self.type_chart.bar_value = data_for_daily_type1
+        # self.type_chart.hour_bar.append(self.type_chart.bar_value)
         self._type_chart_view = QtCharts.QChartView(self.type_chart)
         self._type_chart_view.setRenderHint(QPainter.Antialiasing)
         self.chart_layout = QtWidgets.QHBoxLayout(self.chart_widget)
@@ -195,6 +207,57 @@ class MainWindow(object):
         except:
             print("Cannot connect to database")
 
+    def getdata(self, type):
+        try:
+            conn = mdb.connect(host = HOST,
+                    database = DATABASE,
+                    user = USER,
+                    password = PASSWORD)
+            curr = conn.cursor()
+            query = """SELECT * FROM (
+            SELECT * FROM daily_statistic ORDER BY id DESC LIMIT 3) as r ORDER BY id"""
+            curr.execute(query)
+            current_date = list(curr.fetchall())
+            data_1 = list(current_date[type - 1])[2:]
+            curr.close()
+            conn.close()
+        except:
+            data_1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        return data_1
+# Auto create 3 new rows for the new day
+def auto_update_new_date():
+    conn = mdb.connect(host = HOST,
+                    database = DATABASE,
+                    user = USER,
+                    password = PASSWORD)
+    curr = conn.cursor()
+    query = """select * from daily_statistic where id = (select max(id) from daily_statistic);"""
+    curr.execute(query)
+    current_date = curr.fetchall()
+    if len(current_date) == 0:
+        current_date = "None"
+    else:
+        current_date = str(list(current_date[0])[1])
+    a = datetime.today().strftime('%Y-%m-%d')
+    if a != current_date:
+        query = """insert into daily_statistic (time, g8, g9, g10, g11, g12, g13, g14, g15, g16, g17) 
+                                    values (%s, 14, 32, 13, 15, 34, 53, 61, 13, 43, 33);"""
+        row = curr.execute(query, (a,))
+        conn.commit()
+        query = """insert into daily_statistic (time, g8, g9, g10, g11, g12, g13, g14, g15, g16, g17) 
+                                    values (%s, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);"""
+        row = curr.execute(query, (a,))
+        conn.commit()
+        query = """insert into daily_statistic (time, g8, g9, g10, g11, g12, g13, g14, g15, g16, g17) 
+                                    values (%s, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);"""
+        row = curr.execute(query, (a,))
+        conn.commit()
+    curr.close()
+    conn.close()
+
+
+auto_update_new_date()
 test = MainWindow()
 test.window.show()
+
 sys.exit(test.app.exec_())

@@ -2,11 +2,11 @@ from PySide2.QtCharts import QtCharts
 import PySide2
 from PySide2.QtCore import Qt
 class Bar_Chart(QtCharts.QChart):
-    def __init__(self) -> None:
+    def __init__(self, value = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) -> None:
         super().__init__()
         self.setGeometry(0, 0, 980, 550)
         self.hour_bar = QtCharts.QBarSet('Number of Wastes')
-        self.bar_value = [0, 0, 0, 0, 0 , 0, 0, 0, 0, 0]
+        self.bar_value =  value
         self.hour_bar.append(self.bar_value)
 
         self._bar_series = QtCharts.QBarSeries()
