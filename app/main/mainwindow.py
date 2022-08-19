@@ -8,8 +8,8 @@ from PySide2.QtWidgets import *
 from PySide2 import QtUiTools, QtWidgets
 from PySide2extn.RoundProgressBar import roundProgressBar
 from PySide2.QtCharts import QtCharts
-from PySide2.QtGui import QPainter
-from chart import Bar_Chart
+from PySide2.QtGui import QPainter, QMovie
+from chart import Bar_Chart, Bar_Chart2
 from datetime import datetime
 HOST = 'localhost'
 DATABASE = 'smart_bin'
@@ -17,7 +17,7 @@ USER = 'tblexcel'
 PASSWORD = 'tblexcelsior'
 a = datetime.today().strftime('%Y-%m-%d')
 b = a.split('-')
-
+temp = 0
 class MainWindow(object):
     def __init__(self) -> None:
         super().__init__()
@@ -30,6 +30,15 @@ class MainWindow(object):
         self.chart_frame = self.window.findChild(QFrame, 'Chart')
         self.chart_frame.setVisible(False)
         # Get child object
+
+        ## Processing animation frame
+        self.processing_animation_frame = self.window.findChild(QWidget, 'Processing')
+        self.label = self.window.findChild(QLabel, 'loading')
+        self.movie = QMovie("./app/component/Loading.gif")
+        self.label.setMovie(self.movie)
+        self.movie.start()
+        if temp ==0:   
+            self.processing_animation_frame.setVisible(False)
         ## Exit button
         self.exit_btn = self.window.findChild(QPushButton, 'exit_btn')
 
@@ -49,7 +58,8 @@ class MainWindow(object):
         self.sheet_3 = self.window.findChild(QFrame, 'type_3')
         self.stat_frame = self.window.findChild(QFrame, 'stat_frame')
         ## Chart Frame
-        self.chart_widget = self.window.findChild(QWidget, 'chart_widget')
+        self.chart_widget_daily = self.window.findChild(QWidget, 'chart_widget_daily')
+        self.chart_widget_monthly = self.window.findChild(QWidget, 'chart_widget_monthly')
 
         ## Status text
         self.status = self.window.findChild(QLabel, 'status')
@@ -92,17 +102,26 @@ class MainWindow(object):
         self.rpb_3.rpb_setPathColor((255, 255, 255))
 
         # Bar Graph Setting
-        
-        data_for_daily_type1 = self.getdata(1)
-        self.type_chart = Bar_Chart(data_for_daily_type1)
-        self.type_chart.setParent(self.chart_widget)
-        # self.type_chart.bar_value = data_for_daily_type1
-        # self.type_chart.hour_bar.append(self.type_chart.bar_value)
+        self.data_for_daily_type1 = self.get_daily_data(1)
+        self.type_chart = Bar_Chart(self.data_for_daily_type1)
+        self.type_chart.setParent(self.chart_widget_daily)
         self._type_chart_view = QtCharts.QChartView(self.type_chart)
         self._type_chart_view.setRenderHint(QPainter.Antialiasing)
-        self.chart_layout = QtWidgets.QHBoxLayout(self.chart_widget)
+        self.chart_layout = QtWidgets.QHBoxLayout(self.chart_widget_daily)
         self.chart_layout.setContentsMargins(0, 0, 0, 0)
         self.chart_layout.addWidget(self._type_chart_view)
+
+        self.data_for_mothly_type1 = self.get_montly_data(1)
+        self.type_chart2 = Bar_Chart2(self.data_for_mothly_type1)
+        self.type_chart2.setParent(self.chart_widget_monthly)
+        self._type_chart_view2 = QtCharts.QChartView(self.type_chart2)
+        self._type_chart_view2.setRenderHint(QPainter.Antialiasing)
+        self.chart_layout2 = QtWidgets.QHBoxLayout(self.chart_widget_monthly)
+        self.chart_layout2.setContentsMargins(0, 0, 0, 0)
+        self.chart_layout2.addWidget(self._type_chart_view2)
+
+       
+
 
 
         # Setting text position
@@ -138,33 +157,53 @@ class MainWindow(object):
         self.sheet_1_btn.setParent(self.sheet_1)
         self.sheet_1_btn.setGeometry(0, 0, 250, 400)
         self.sheet_1_btn.setStyleSheet('background-color: rgba(255, 255, 255, 0);')
-        self.sheet_1_btn.connect(self.sheet_1_btn, SIGNAL('clicked()'), self.open_chart)
+        self.sheet_1_btn.connect(self.sheet_1_btn, SIGNAL('clicked()'), self.open_chart1)
 
         self.sheet_2_btn = QPushButton()
         self.sheet_2_btn.setParent(self.sheet_2)
         self.sheet_2_btn.setGeometry(0, 0, 250, 400)
         self.sheet_2_btn.setStyleSheet('background-color: rgba(255, 255, 255, 0);')
-        self.sheet_2_btn.connect(self.sheet_2_btn, SIGNAL('clicked()'), self.open_chart)
+        self.sheet_2_btn.connect(self.sheet_2_btn, SIGNAL('clicked()'), self.open_chart2)
 
         self.sheet_3_btn = QPushButton()
         self.sheet_3_btn.setParent(self.sheet_3)
         self.sheet_3_btn.setGeometry(0, 0, 250, 400)
         self.sheet_3_btn.setStyleSheet('background-color: rgba(255, 255, 255, 0);')
-        self.sheet_3_btn.connect(self.sheet_3_btn, SIGNAL('clicked()'), self.open_chart)
+        self.sheet_3_btn.connect(self.sheet_3_btn, SIGNAL('clicked()'), self.open_chart3)
         ## Statistic Button
         self.stat_btn = QPushButton()
         self.stat_btn.setParent(self.stat_frame)
         self.stat_btn.setGeometry(0, 0, 200, 60)
         self.stat_btn.setStyleSheet('background-color: rgba(255, 255, 255, 0);')
-        self.stat_btn.connect(self.stat_btn, SIGNAL('clicked()'), self.open_chart)
+        self.stat_btn.connect(self.stat_btn, SIGNAL('clicked()'), self.open_chart3)
 
         ## Exit button
         self.exit_btn.connect(self.exit_btn, SIGNAL('clicked()'), self.exit)
     # Callback function
     ##----------------- Need to update ------------------------##
-    def open_chart(self):
+    def open_chart1(self):
         self.main_frame.setVisible(False)
         self.chart_frame.setVisible(True)
+        self.chart_widget_monthly.setVisible(False)
+        # self.data_for_daily_type1 = self.getdata(1)
+        # self.type_chart.bar_value = self.data_for_daily_type1
+        # self.type_chart.hour_bar.append(self.type_chart.bar_value)
+        # self.type_chart._bar_series = QtCharts.QBarSeries()
+        # self.type_chart._bar_series.append(self.type_chart.hour_bar)
+
+
+    def open_chart2(self):
+        self.main_frame.setVisible(False)
+        self.chart_frame.setVisible(True)
+        # self.data_for_daily_type2 = self.getdata(2)
+        # self.type_chart.bar_value = self.data_for_daily_type2
+
+
+    def open_chart3(self):
+        self.main_frame.setVisible(False)
+        self.chart_frame.setVisible(True)
+        # self.data_for_daily_type3 = self.getdata(3)
+        # self.type_chart.bar_value = self.data_for_daily_type3
     
     def toggle_clicked(self):
         if self.toggle_status == 0:
@@ -172,11 +211,15 @@ class MainWindow(object):
             self.toggle_month.setVisible(True)
             self.toggle_day.setVisible(False)
             self.day_picker.setVisible(False)
+            self.chart_widget_daily.setVisible(False)
+            self.chart_widget_monthly.setVisible(True)
         elif self.toggle_status == 1:
             self.toggle_status = 0
             self.toggle_month.setVisible(False)
             self.toggle_day.setVisible(True)
             self.day_picker.setVisible(True)
+            self.chart_widget_daily.setVisible(True)
+            self.chart_widget_monthly.setVisible(False)
         self.toggle_slider.setGeometry(self.toggle_status * 50, 0, 50, 40)
 
     def exit(self):
@@ -207,7 +250,7 @@ class MainWindow(object):
         except:
             print("Cannot connect to database")
 
-    def getdata(self, type):
+    def get_daily_data(self, type):
         try:
             conn = mdb.connect(host = HOST,
                     database = DATABASE,
@@ -218,12 +261,28 @@ class MainWindow(object):
             SELECT * FROM daily_statistic ORDER BY id DESC LIMIT 3) as r ORDER BY id"""
             curr.execute(query)
             current_date = list(curr.fetchall())
-            data_1 = list(current_date[type - 1])[2:]
+            data = list(current_date[type - 1])[2:]
             curr.close()
             conn.close()
         except:
-            data_1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        return data_1
+            data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        
+        return data
+    
+    def get_montly_data(self, type):
+        conn = mdb.connect(host = HOST,
+                    database = DATABASE,
+                    user = USER,
+                    password = PASSWORD)
+        curr = conn.cursor()
+        query = """SELECT * FROM (
+            SELECT * FROM monthly_statistic ORDER BY id DESC LIMIT 3) as r ORDER BY id"""
+        curr.execute(query)
+        current_date = list(curr.fetchall())
+        data = list(current_date[type - 1])[1:]
+        curr.close()
+        conn.close()
+        return data
 # Auto create 3 new rows for the new day
 def auto_update_new_date():
     conn = mdb.connect(host = HOST,
