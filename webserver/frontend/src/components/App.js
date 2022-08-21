@@ -2,7 +2,7 @@ import './App.css';
 import FormDiv from './form';
 import { useState, useEffect, useRef } from 'react';
 import Header from './Header';
-
+import MainContentUnSigned from './MainContentUnSigned';
 function App() {
   const [showForm, setShowForm] = useState(false)
   const [signType, setSignType] = useState(true)
@@ -40,6 +40,7 @@ function App() {
             </div>
         :   <div className='app-main'>
               <Header showFormHandle={setShowForm} setTypeHandle={setSignType} />
+              <MainContentUnSigned />
             </div>
       }
     </div>

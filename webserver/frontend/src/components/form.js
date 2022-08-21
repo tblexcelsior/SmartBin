@@ -7,8 +7,6 @@ import SignUp from "./signup";
 
 export default function FormDiv(props){
     const [signType, setSignType] = useState(true)
-
-
     
     return(
         <div className="app-form-div" ref={props.wRef} >   

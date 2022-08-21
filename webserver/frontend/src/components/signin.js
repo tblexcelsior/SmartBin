@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import './App.css'
+import axios from "axios";
 
 export default function SignIn(){
     const [formData, setFormData] = useState(
@@ -14,9 +15,14 @@ export default function SignIn(){
             }
         })
     }
-    function handleSubmit(event){
+    async function handleSubmit(event){
         event.preventDefault()
-        console.log(formData)
+        let res = await axios({
+            method: 'post',
+            url: 'http://localhost:4000/signin',
+            data: formData
+        })
+        console.log(res)
     }
     return(
             <form onSubmit={handleSubmit} className="app-form-main">
@@ -27,6 +33,7 @@ export default function SignIn(){
                     name='username'
                     value={formData.username}
                     className="app-form-submit-input"
+                    autoComplete="off"
                     required = 'required'
                 />
                 <input 
@@ -36,6 +43,7 @@ export default function SignIn(){
                     name='password'
                     value={formData.password}
                     className="app-form-submit-input"
+                    autoComplete="off"
                     required = 'required'
                 />
                 <input 

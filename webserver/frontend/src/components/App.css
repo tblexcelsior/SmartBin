@@ -1,41 +1,108 @@
 .app-main-bar{
     width:100%;
     height: 65px;
-    background-color: rgb(148, 242, 136);
     display: flex;
-    justify-content: center;
     align-items: center;
-    position: relative;
+    justify-content: space-between;
 }
 .app-header{
-    margin: 0px;
+    margin:0px;
+    display: flex;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    margin-left: 30px;
+    color:rgb(104, 219, 104)
+    
+}
+.app-header-img{
+    height: 30px;
+    margin: 5px;
 }
 .app-header{
     cursor: pointer;
 }
 .app-header-btn-div{
     display: flex;
-    position: absolute;
-    right: 30px;
+    margin-right: 30px;
 }
 .app-header-btn{
     margin: 0px;
     height: 40px;
-    width: 80px;
+    width: 90px;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 5px;
-    border: solid 2px white;
+    border-radius: 25px;
+    border: solid 1px rgb(180, 176, 176);
     margin: 5px;
+    font-size: 15px;
 }
 #sign-up.app-header-btn{
-    background-color: rgba(255, 255, 255, 0.786);
+    background-color: rgb(104, 219, 104);
+    color: white;
+    border: none;
 }
 .app-header-btn:hover{
     cursor: pointer;
 }
+/* Main Content */
+.app-main-content{
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+.app-main-content-info-div{
+    position: absolute;
+    top: 10%;
+    left: 10%;
+}
+.app-main-content-name1{
+    font-size: 70px;
+    top: 15%;
+    margin-bottom: -20px;
+}
+.app-main-content-name2{
+    max-width: 600px;
+    font-size: 50px;
+    color: rgb(104, 219, 104);
+}
+.app-main-content-img{
+    margin: 0;
+    padding: 0px;
+    height: 500px;
+    margin-top: 60px;
+    margin-left: auto;
+    margin-right: 150px;
+}
+.app-main-content-subinfo-div{
+    position: absolute;
+    bottom: -10%;
+    left: 10%;
+    display: flex;
+}
 
+.app-content-subinfo{
+    height: 200px;
+    max-width: 300px;
+    margin-right: 20px;
+}
+
+
+.rotate {
+    animation: rotation 15s infinite linear;
+  }
+  
+  @keyframes rotation {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(359deg);
+    }
+  }
+
+/* Sign In/Up Button */
 .app-form-frame{
     height: 100vh;
     width: 100vw;
