@@ -1,0 +1,134 @@
+.app-main-bar{
+    width:100%;
+    height: 65px;
+    background-color: rgb(148, 242, 136);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+.app-header{
+    margin: 0px;
+}
+.app-header{
+    cursor: pointer;
+}
+.app-header-btn-div{
+    display: flex;
+    position: absolute;
+    right: 30px;
+}
+.app-header-btn{
+    margin: 0px;
+    height: 40px;
+    width: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    border: solid 2px white;
+    margin: 5px;
+}
+#sign-up.app-header-btn{
+    background-color: rgba(255, 255, 255, 0.786);
+}
+.app-header-btn:hover{
+    cursor: pointer;
+}
+
+.app-form-frame{
+    height: 100vh;
+    width: 100vw;
+    background-color: rgba(159, 246, 159, 0.578);
+    display: flex;
+    justify-content: center;
+}
+.app-form-div{
+    height: 500px;
+    width: 400px;
+    border-radius: 10px;
+    background-color: rgba(47, 45, 45, 0.453);
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+.app-form-header{
+    margin: 30px 0 30x 0;
+}
+.app-form-main{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-self: center;
+}
+.app-form-submit-input{
+    height: 50px;
+    width: 300px;
+    border-radius: 5px;
+    border: solid 2px white;
+    background-color: rgba(255, 255, 255, 0);
+    margin: 8px;
+    color: white;
+    outline: None;
+}
+.app-form-submit-input::placeholder{
+    color: white;
+}
+.app-form-submit-input:focus::placeholder {
+    color: transparent;
+    background-color: rgba(255, 255, 255, 0);
+}
+.app-form-submit-input:-webkit-autofill,
+.app-form-submit-input:-webkit-autofill:hover, 
+.app-form-submit-input:-webkit-autofill:focus, 
+.app-form-submit-input:-webkit-autofill:active{
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+}
+
+.app-form-submit-btn{
+    height: 50px;
+    width: 200px;
+    border-radius: 5px;
+    border: solid 2px white;
+    background-color: rgba(255, 255, 255, 0);
+    color: white;
+    position: absolute;
+    bottom: 40px;
+}
+
+.app-form-submit-btn:hover{
+    background-color: white;
+    color: black;
+    
+}
+.app-form-switch{
+    height: 20px;
+    width: 150px;
+    background-color: rgba(255, 255, 255, 0);
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: solid 2px white;
+    display: flex;
+    align-items: center;
+}
+.app-form-switch:hover{
+    cursor: pointer;
+}
+
+.app-form-switch-state{
+    height: 20px;
+    width: 75px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color:   rgb(255, 255, 255);
+    font-size: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#check.app-form-switch-state{
+    transform: translate(75px, 0);
+}
